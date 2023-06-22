@@ -2,7 +2,14 @@
   <a href="/" class="logo">Logo</a>
   <nav>
     <a href="/">home</a>
+    <a href="/cars">cars</a>
+
+    <% if(locals.user){ %>
+    <button><%= locals.user.username %></button>
+    <a href="/logout">logout</a>
+    <%} else {%>
     <a href="/register">register</a>
     <a href="/login">login</a>
+    <%}%>
   </nav>
 </header>

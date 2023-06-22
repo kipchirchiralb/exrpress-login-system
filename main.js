@@ -1,4 +1,6 @@
 const express = require("express");
+const session = require("express-session");
+
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
@@ -15,12 +17,31 @@ dbconn.query(
 );
 
 app.use(express.urlencoded({ extended: false }));
+app.use(
+  session({
+    secret: "keyboard",
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use((req, res, next) => {
+  if (req.session.user) {
+    res.locals.user = req.session.user;
+  } else {
+    res.locals.user = null; // falsy values -  null, undefined , 0
+  }
+  next();
+});
 
 app.get("/", (req, res) => {
   res.render("home.ejs");
 });
 app.get("/login", (req, res) => {
-  res.render("login.ejs");
+  if (req.session.user) {
+    res.redirect("/");
+  } else {
+    res.render("login.ejs");
+  }
 });
 app.post("/login", (req, res) => {
   // logic
@@ -37,7 +58,8 @@ app.post("/login", (req, res) => {
         bcrypt.compare(req.body.pass, data[0].password, (err, isMatch) => {
           if (isMatch) {
             // create a session
-            res.redirect("/");
+            req.session.user = data[0];
+            req.res.redirect("/");
           } else {
             res.render("login.ejs", {
               errorMessage: "Email of Password incorrect",
@@ -52,8 +74,17 @@ app.post("/login", (req, res) => {
     }
   );
 });
+app.get("/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.redirect("/");
+  });
+});
 app.get("/register", (req, res) => {
-  res.render("signup.ejs");
+  if (req.session.user) {
+    res.redirect("/");
+  } else {
+    res.render("signup.ejs");
+  }
 });
 app.post("/register", (req, res) => {
   // logic
@@ -86,6 +117,21 @@ app.post("/register", (req, res) => {
       }
     }
   );
+});
+
+app.get("/cars", (req, res) => {
+  if (req.session.user) {
+    //continues
+    res.render("cars.ejs");
+  } else {
+    res.redirect("/login");
+  }
+});
+app.get("/cars/type", (req, res) => {
+  console.log(req.query.cat);
+  console.log(req.query.model);
+  // go to db use Where clause -- select * from vehicles where category = ?  [req.query.cat]
+  res.render("carscat.ejs", { category: req.query.cat });
 });
 
 app.listen(3001, () => console.log("Server running on port 3001"));

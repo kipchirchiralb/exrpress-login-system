@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login System</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+  </head>
+  <body>
+    <%- include("header.ejs") %>
+    <main>
+      <h1>Car Categories</h1>
+      <div>
+        <a href="/cars/type?cat=suv&model=bmw">suvs</a>
+        <a href="/cars/type?cat=van">vans</a>
+        <a href="/cars/type?cat=motorbike">motobikes</a>
+      </div>
+    </main>
+    <footer>
+      <center>loginsystem &copy; <%=new Date().getFullYear()%></center>
+    </footer>
+  </body>
+</html>
